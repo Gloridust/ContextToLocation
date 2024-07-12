@@ -25,5 +25,8 @@ def use_llm():
     response = ollama.generate(model=model_name, prompt=prompt)
     print(response['response'])
     
-if __name__=="__main__":
+def main():
     use_llm()
+
+if __name__=="__main__":
+    main()
