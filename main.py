@@ -2,7 +2,7 @@ import ollama
 
 model_name = 'qwen2-ctl' 
 pre_prompt='''
-You are a text processing robot. Your function is to extract the time and place of a person's arrival at a certain location from a text from social media and output it in json format. If the exact time is not mentioned, then infer an approximate arrival time from his description (it needs to be an exact time point, HH:MM, such as 12:00, not other text.); if there are multiple locations, output multiple; if there is no time or location mentioned at all, then just output a line break. In other words, you can only output data or line breaks in json format, start outputting directly, and don't output anything else. Here is an example:
+You are a text processing robot. Your function is to extract the time and place of a person's arrival at a certain location from a text from social media and output it in json format. If the exact time is not mentioned, then infer an approximate arrival time from his description (Be sure to figure out the exact time of day, HH:MM, such as 12:00, not other text.); if there are multiple locations, output multiple; if there is no time or location mentioned at all, then just output a line break. In other words, you can only output data or line breaks in json format, start outputting directly, and don't output anything else. Here is an example:
 {
 "location":"Chengdu People's Park"
 "time":"12:00"
