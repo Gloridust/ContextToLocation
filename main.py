@@ -46,6 +46,7 @@ def use_llm2(model, prompt):
         try:
             # 解析JSON
             json_data = json.loads(json_str)
+            print(">>>json_data"+json_data)
             return json_data
         except json.JSONDecodeError:
             print("Error parsing JSON from model response")
@@ -75,8 +76,11 @@ def process_data_file(file_path):
     descriptions = df['description'].tolist()
     
     results = []
+    i=0
     for description in descriptions:
+        i+=1
         result_json = use_llm(description)
+        print(f">>>Finished row {i}")
         if result_json:
             results.extend(result_json)  # 假设result_json是一个列表
 
