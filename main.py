@@ -40,9 +40,12 @@ def use_llm2(model, prompt):
     print(response['response'])
     return response['response']
 
-def main():
+def use_llm():
     result1 = use_llm1()
     result2 = use_llm2(model=model_name, prompt=pre_prompt2 + result1)
+    
+def main():
+    use_llm()
 
 if __name__=="__main__":
     main()
