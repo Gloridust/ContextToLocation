@@ -48,9 +48,8 @@ def process_xlsx_file(file_path):
     descriptions = df['description'].tolist()
     
     results = []
-    for description in descriptions:
-        # Assuming use_llm is defined elsewhere and returns a JSON object
-        result_json = use_llm(description)
+    for input_context in descriptions:
+        result_json = use_llm(input_context)
         results.append(result_json)
     
     # Write results to JSON file
@@ -63,11 +62,6 @@ def process_xlsx_file(file_path):
 def main():
     file_path = 'your_file.xlsx'
     process_xlsx_file(file_path)
-    input_context='''
-    昨夜结束了三天的自驾游旅行（新都-自贡恐龙博物馆-宜宾李庄古镇-蜀南竹海-中国西部大峡谷，行程千余公里）回到了南充，此次旅游总的来说很不错，四家人在一起（三辆车），一边开车一边欣赏沿途的风景，有说有笑其乐融融（驾驶的时候对讲机很起作用哦），就是感觉时间有点紧，一个人驾驶还是有点累！ 
-    '''
-    result_json=use_llm(input_context)
-    print("result_json>>>"+result_json)
 
 if __name__=="__main__":
     main()
