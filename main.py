@@ -15,7 +15,7 @@ If you are unsure, you can infer a reasonable time during the day, which must be
 This time must be reasonable. Based on your experience, what time of day is he likely to visit here.
 Be sure to figure out the exact time of day, such as 12:00, not other text, which must be in the format of HH:MM;
 You need to consider that this time must be reasonable. Based on your experience, what time of day he might visit here?
-In other words, you must output All data in json, start outputting directly, and don't output anything else. Here is an example:
+In other words, you must output All data in json, start outputting json directly, and don't output anything else. Here is an example:
 {
 "location":"Chengdu People's Park",
 "time":"12:00"
