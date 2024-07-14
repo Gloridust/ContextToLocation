@@ -1,6 +1,7 @@
 import ollama
 import pandas as pd
 import json
+import os
 
 model_name = 'gemma2' 
 
@@ -43,17 +44,27 @@ def use_llm(input_context):
     result2 = use_llm2(model=model_name, prompt=pre_prompt2 + result1)
     return result2
 
-def process_xlsx_file(file_path):
-    df = pd.read_excel(file_path)
+def process_data_file(file_path):
+    file_name, file_extension = os.path.splitext(file_path)
+    
+    if file_extension == '.xlsx':
+        df = pd.read_excel(file_path)
+    elif file_extension == '.csv':
+        df = pd.read_csv(file_path)
+    else:
+        raise ValueError(f"Unsupported file type: {file_extension}. Only xlsx and csv are supported.")
+    
+    if 'description' not in df.columns:
+        raise ValueError("Column 'description' not found in the data.")
+    
     descriptions = df['description'].tolist()
     
     results = []
-    for input_context in descriptions:
-        result_json = use_llm(input_context)
+    for description in descriptions:
+        result_json = use_llm(description)
         results.append(result_json)
-    
-    # Write results to JSON file
-    json_file = file_path.replace('.xlsx', '.json')
+
+    json_file = file_name + '.json'
     with open(json_file, 'a', encoding='utf-8') as f:
         for result in results:
             json.dump(result, f, ensure_ascii=False)
@@ -61,7 +72,7 @@ def process_xlsx_file(file_path):
             
 def main():
     file_path = 'your_file.xlsx'
-    process_xlsx_file(file_path)
+    process_data_file(file_path)
 
 if __name__=="__main__":
     main()
