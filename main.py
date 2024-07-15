@@ -2,6 +2,9 @@ import ollama
 import pandas as pd
 import json
 import os
+import glob
+from concurrent.futures import ThreadPoolExecutor
+import logging
 
 model_name = 'gemma2' 
 
@@ -28,31 +31,32 @@ Output ONLY valid JSON array, nothing else. Example format:
 Process the following information:
 '''
 
+# 设置日志
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def use_llm1(input_context):
     response = ollama.generate(model=model_name, prompt=pre_prompt1 + input_context)
-    print(response['response'])
+    logger.debug(response['response'])
     return response['response']
 
 def use_llm2(model, prompt):
     response = ollama.generate(model=model, prompt=prompt)
     raw_response = response['response']
     
-    # 清理响应，只保留JSON部分
     json_start = raw_response.find('[')
     json_end = raw_response.rfind(']') + 1
     if json_start != -1 and json_end != -1:
         json_str = raw_response[json_start:json_end]
         try:
-            # 解析JSON
             json_data = json.loads(json_str)
-            print(">>>json_data"+json_data)
+            logger.debug(f"Parsed JSON data: {json_data}")
             return json_data
         except json.JSONDecodeError:
-            print("Error parsing JSON from model response")
+            logger.error("Error parsing JSON from model response")
             return None
     else:
-        print("No valid JSON found in model response")
+        logger.error("No valid JSON found in model response")
         return None
 
 def use_llm(input_context):
@@ -61,36 +65,53 @@ def use_llm(input_context):
     return result2 if result2 else []
 
 def process_data_file(file_path):
+    logger.info(f"Processing file: {file_path}")
     file_name, file_extension = os.path.splitext(file_path)
     
-    if file_extension == '.xlsx':
-        df = pd.read_excel(file_path)
-    elif file_extension == '.csv':
-        df = pd.read_csv(file_path)
-    else:
-        raise ValueError(f"Unsupported file type: {file_extension}. Only xlsx and csv are supported.")
-    
-    if 'description' not in df.columns:
-        raise ValueError("Column 'description' not found in the data.")
-    
-    descriptions = df['description'].tolist()
-    
-    results = []
-    i=0
-    for description in descriptions:
-        i+=1
-        result_json = use_llm(description)
-        print(f">>>Finished row {i}")
-        if result_json:
-            results.extend(result_json)  # 假设result_json是一个列表
+    try:
+        if file_extension == '.xlsx':
+            df = pd.read_excel(file_path)
+        elif file_extension == '.csv':
+            df = pd.read_csv(file_path)
+        else:
+            logger.error(f"Unsupported file type: {file_extension}. Only xlsx and csv are supported.")
+            return
+        
+        if 'description' not in df.columns:
+            logger.error(f"Column 'description' not found in the file: {file_path}")
+            return
+        
+        descriptions = df['description'].tolist()
+        
+        results = []
+        for i, description in enumerate(descriptions, 1):
+            result_json = use_llm(description)
+            logger.info(f"Finished processing row {i} in file {file_path}")
+            if result_json:
+                results.extend(result_json)
 
-    json_file = file_name + '.json'
-    with open(json_file, 'w', encoding='utf-8') as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
-            
+        json_file = file_name + '_processed.json'
+        with open(json_file, 'w', encoding='utf-8') as f:
+            json.dump(results, f, ensure_ascii=False, indent=2)
+        
+        logger.info(f"Finished processing file: {file_path}")
+    except Exception as e:
+        logger.error(f"Error processing file {file_path}: {str(e)}")
+
 def main():
-    file_path = './data/wb-chengdu-city.csv'
-    process_data_file(file_path)
+    data_dir = './data/'
+    file_patterns = ['*.csv', '*.xlsx']
+    all_files = []
+    for pattern in file_patterns:
+        all_files.extend(glob.glob(os.path.join(data_dir, pattern)))
+    
+    logger.info(f"Found {len(all_files)} files to process")
+
+    # 使用ThreadPoolExecutor进行多线程处理
+    with ThreadPoolExecutor(max_workers=4) as executor:  # 可以根据需要调整max_workers
+        executor.map(process_data_file, all_files)
+
+    logger.info("All files have been processed.")
 
 if __name__=="__main__":
     main()
