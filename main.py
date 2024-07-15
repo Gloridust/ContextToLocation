@@ -8,6 +8,7 @@ import logging
 
 model_name = 'gemma2' 
 description_col='description'
+max_workers=8
 
 pre_prompt1='''
 你是一个旅游大数据规划专家，从下面出行计划文本中，规划出自驾旅客对应每个景点的到达时间。如果遇到不确定的数据，通过你的经验推测出来。以到达地点-时间点的格式，直接输出你的推测结果，其中时间是指你推测的时刻，如：14:00。
@@ -109,7 +110,7 @@ def main():
     logger.info(f"Found {len(all_files)} files to process")
 
     # 使用ThreadPoolExecutor进行多线程处理
-    with ThreadPoolExecutor(max_workers=4) as executor:  # 可以根据需要调整max_workers
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:  # 可以根据需要调整max_workers
         executor.map(process_data_file, all_files)
 
     logger.info("All files have been processed.")
