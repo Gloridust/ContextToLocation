@@ -108,9 +108,8 @@ def main():
         all_files.extend(glob.glob(os.path.join(data_dir, pattern)))
     
     logger.info(f"Found {len(all_files)} files to process")
-
-    # 使用ThreadPoolExecutor进行多线程处理
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:  # 可以根据需要调整max_workers
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         executor.map(process_data_file, all_files)
 
     logger.info("All files have been processed.")
