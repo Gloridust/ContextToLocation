@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 
 model_name = 'gemma2' 
+description_col='description'
 
 pre_prompt1='''
 你是一个旅游大数据规划专家，从下面出行计划文本中，规划出自驾旅客对应每个景点的到达时间。如果遇到不确定的数据，通过你的经验推测出来。以到达地点-时间点的格式，直接输出你的推测结果，其中时间是指你推测的时刻，如：14:00。
@@ -77,11 +78,11 @@ def process_data_file(file_path):
             logger.error(f"Unsupported file type: {file_extension}. Only xlsx and csv are supported.")
             return
         
-        if 'description' not in df.columns:
-            logger.error(f"Column 'description' not found in the file: {file_path}")
+        if description_col not in df.columns:
+            logger.error(f"Column '{description_col}' not found in the file: {file_path}")
             return
         
-        descriptions = df['description'].tolist()
+        descriptions = df[description_col].tolist()
         
         results = []
         for i, description in enumerate(descriptions, 1):
