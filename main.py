@@ -1,5 +1,5 @@
 import ollama
-from pre_prompt import pre_prompt1, pre_prompt2
+from pre_prompt import pre_prompt1,pre_prompt2
 import pandas as pd
 import json
 import os
@@ -63,18 +63,13 @@ def process_data_file(file_path):
             logger.error(f"Column '{description_col}' not found in the file: {file_path}")
             return
         
+        descriptions = df[description_col].tolist()
+        
         results = []
-        for index, row in df.iterrows():
-            # 将整行数据转换为字符串
-            input_context = ' '.join([f"{col}: {value}" for col, value in row.items() if pd.notna(value)])
-            
-            result_json = use_llm(input_context)
-            logger.info(f"Finished processing row {index + 1} in file {file_path}")
-            
+        for i, description in enumerate(descriptions, 1):
+            result_json = use_llm(description)
+            logger.info(f"Finished processing row {i} in file {file_path}")
             if result_json:
-                # 添加原始数据到结果中
-                for item in result_json:
-                    item.update(row.to_dict())
                 results.extend(result_json)
 
         json_file = file_name + '_processed.json'
