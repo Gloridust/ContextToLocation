@@ -1,5 +1,5 @@
 import ollama
-from pre_prompt import pre_prompt1,pre_prompt2
+from pre_prompt import pre_prompt1, pre_prompt2
 import pandas as pd
 import json
 import os
@@ -9,8 +9,7 @@ import logging
 
 #####config#####
 model_name = 'gemma2' 
-description_col='description'
-max_workers=8
+max_workers = 2
 ################
 
 # 设置日志
@@ -59,16 +58,12 @@ def process_data_file(file_path):
             logger.error(f"Unsupported file type: {file_extension}. Only xlsx and csv are supported.")
             return
         
-        if description_col not in df.columns:
-            logger.error(f"Column '{description_col}' not found in the file: {file_path}")
-            return
-        
-        descriptions = df[description_col].tolist()
-        
         results = []
-        for i, description in enumerate(descriptions, 1):
-            result_json = use_llm(description)
-            logger.info(f"Finished processing row {i} in file {file_path}")
+        for i, row in df.iterrows():
+            # 将所有列的数据合并为一个字符串
+            all_data = ' '.join(row.astype(str).values)
+            result_json = use_llm(all_data)
+            logger.info(f"Finished processing row {i+1} in file {file_path}")
             if result_json:
                 results.extend(result_json)
 
