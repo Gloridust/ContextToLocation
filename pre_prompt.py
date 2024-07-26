@@ -19,5 +19,5 @@ Example format:
   }
 ]
 
-Process the following information:
+Process the following information,Only location and time need to be output:
 '''
