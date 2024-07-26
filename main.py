@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 
 #####config#####
-model_name = 'gemma2' 
+model_name = 'llama3.1' 
 max_workers = 2
 ################
 
