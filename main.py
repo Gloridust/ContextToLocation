@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 
 #####config#####
-model_name = 'llama3.1' 
+model_name = 'qwen2:7b' 
 max_workers = 2
 ################
 
